@@ -1,0 +1,22 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+
+:root {
+   --color-light-bg: #F5F5F5;
+   --color-dark-bg: #101828;
+   --color-dark-text: white;
+ }
+ body {
+   transition: background-color 0.3s ease-in-out;
+ }
+ body.theme-light {
+   background-color: var(--color-light-bg);
+ }
+ 
+ body.theme-dark {
+   background-color: var(--color-dark-bg);
+   color: var(--color-dark-text);
+ }
+
