@@ -16,6 +16,7 @@ const Button: React.FC<ButtonProps> = ({
     primary: `text-white bg-blue-500 hover:bg-blue-600 focus:ring-blue-500 disabled:bg-gray-400`,
     secondary: `text-blue-500 bg-white border border-blue-500 hover:bg-blue-100 focus:ring-blue-500 disabled:bg-gray-100`,
     tertiary: `text-gray-700 bg-transparent hover:text-gray-900 focus:ring-gray-500 disabled:text-gray-400`,
+    cuarteatry: '',
   };
 
   return (
@@ -23,7 +24,7 @@ const Button: React.FC<ButtonProps> = ({
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={`${baseStyles} ${variantStyles[variant]} ${className}`}
+      className={`${baseStyles} hover:cursor-pointer ${variantStyles[variant]} ${className}`}
     >
       {children}
     </button>
