@@ -1,9 +1,14 @@
+import React, { useState } from "react";
 import { FaTrash } from "react-icons/fa";
 import { FaPencil } from "react-icons/fa6";
 import { FiCpu, FiMail, FiShield, FiUser, FiUsers } from "react-icons/fi";
 import Button from "../../../../components/common/Button";
+import SkeletonLoader from "../../../../components/common/SkeletonLoader";
 import Table, { Column } from "../../../../components/common/Table";
+import Alert from "../../../../components/ui/alert/Alert";
+import { Modal } from "../../../../components/ui/modal";
 import { User } from "../../../../interfaces/api/userInterface";
+import { useGetUserGroupsQuery } from "../../../../services/usersSupabase";
 
 interface UsersTableProps {
   data: User[];
@@ -14,6 +19,11 @@ const UsersTable: React.FC<UsersTableProps> = ({
   data,
   showDeviceIp = true,
 }) => {
+  // Estado para el modal y el usuario seleccionado
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+
+
   const columns: Column<User>[] = [
     {
       key: "user_name",
@@ -78,6 +88,21 @@ const UsersTable: React.FC<UsersTableProps> = ({
       ),
     },
     {
+      key: "patients",
+      title: "Pacientes",
+      sortable: false,
+      render: (_: unknown, row: User) => (
+        <Button
+          onClick={() => handleShowPatients(row.user_id)}
+          type={"button"}
+          disabled={false}
+          variant={"secondary"}
+        >
+          Info
+        </Button>
+      ),
+    },
+    {
       key: "actions", // Cambiado de user_name a actions
       title: "Operación",
       sortable: false,
@@ -107,6 +132,16 @@ const UsersTable: React.FC<UsersTableProps> = ({
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+        {selectedUser && (
+          <div>
+            <h3 className="text-lg font-bold mb-2">Usuario seleccionado</h3>
+            <p>ID: {selectedUser.user_id}</p>
+            <p>Nombre: {selectedUser.user_name}</p>
+            {/* Puedes agregar más información aquí si lo deseas */}
+          </div>
+        )}
+      </Modal>
       <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">
         Lista de Usuarios
       </h2>

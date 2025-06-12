@@ -5,10 +5,9 @@ import { User } from "../../../../interfaces/api/userInterface";
 import { useGetItemsQuery } from "../../../../services/usersSupabase";
 import UsersTable from "./UsersTable";
 
-const RegisterUsers: React.FC = () => {
+const Users: React.FC = () => {
   const { data: usersData = [], isLoading, error } = useGetItemsQuery("");
-
-  // Normalizar la estructura para que roles y user_groups sean objetos
+  
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const users: User[] = (usersData ?? []).map((user: any) => ({
     ...user,
@@ -22,6 +21,7 @@ const RegisterUsers: React.FC = () => {
   const showDeviceIp = users.some(
     (user) => user.roles.role_name !== "enfermero"
   );
+
 
   if (isLoading) return <SkeletonLoader />;
   if (error)
@@ -40,4 +40,4 @@ const RegisterUsers: React.FC = () => {
   );
 };
 
-export default RegisterUsers;
+export default Users;

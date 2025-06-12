@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Button from "../../../components/common/Button";
 import { Modal } from "../../../components/ui/modal";
-import RegisterUsers from "./components/RegisterUsers";
+import Users from "./components/Users";
 const Register: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -17,7 +17,7 @@ const Register: React.FC = () => {
         </div>
         } />
 
-        <RegisterUsers/>
+        <Users/>
     </div>
   );
 };
