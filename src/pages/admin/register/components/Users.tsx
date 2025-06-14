@@ -18,9 +18,7 @@ const Users: React.FC = () => {
   }));
 
   // Determinar si hay algún usuario que NO sea enfermero
-  const showDeviceIp = users.some(
-    (user) => user.roles.role_name !== "enfermero"
-  );
+
 
 
   if (isLoading) return <SkeletonLoader />;
@@ -35,7 +33,7 @@ const Users: React.FC = () => {
 
   return (
     <div>
-      <UsersTable data={users} showDeviceIp={showDeviceIp} />
+      <UsersTable data={users}  />
     </div>
   );
 };
