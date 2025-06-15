@@ -11,7 +11,7 @@ import {
 import { Link, useLocation } from "react-router";
 import { NavItem } from "../../interfaces/pages/sidebar";
 import { useSidebar } from "../../store/SidebarContext";
-import { FaGroupArrowsRotate } from "react-icons/fa6";
+import { FaGroupArrowsRotate, FaPersonSkating } from "react-icons/fa6";
 
 const navItems: NavItem[] = [
   {
@@ -32,6 +32,11 @@ const navItems: NavItem[] = [
     icon: <FaGroupArrowsRotate />,
     name: "Grupos",
     path: "/admin/groups",
+  },
+    {
+    icon: <FaPersonSkating />,
+    name: "Pacientes",
+    path: "/admin/patients",
   },
   {
     icon: <BiUser />,

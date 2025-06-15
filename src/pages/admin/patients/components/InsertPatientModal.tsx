@@ -1,30 +1,32 @@
 import React, { useEffect, useState } from "react";
 import Button from "../../../../components/common/Button";
 import Input from "../../../../components/common/Input";
+import Select from "../../../../components/common/Select";
 import Alert from "../../../../components/ui/alert/Alert";
 import { Modal } from "../../../../components/ui/modal";
-import { Group } from "../../../../interfaces/groups";
 import { useGetGroupsQuery } from "../../../../services/GroupSupabase";
-import { useInsertUserMutation } from "../../../../services/usersSupabase";
+import { useInsertUserMutation } from "../../../../services/patientsSupabase";
 
-interface InsertUserModalProps {
+interface InsertPatientModalProps {
   isOpen: boolean;
   onClose: () => void;
-  refetchUsers?: () => void;
+  refetchPatients?: () => void;
 }
 
-const InsertUserModal: React.FC<InsertUserModalProps> = ({
+const InsertPatientModal: React.FC<InsertPatientModalProps> = ({
   isOpen,
   onClose,
-  refetchUsers,
+  refetchPatients,
 }) => {
   const [form, setForm] = useState({
     user_name: "",
     user_email: "",
     user_password: "",
-    fk_group_id: 0,
+    device_ip: "",
+    fk_group_id: "",
   });
-  const [insertUser, { isLoading, error, isSuccess }] = useInsertUserMutation();
+  const { data: groupsData } = useGetGroupsQuery({});
+  const [createUser, { isLoading, error, isSuccess }] = useInsertUserMutation();
   const [showAlert, setShowAlert] = useState(false);
   const [alertType, setAlertType] = useState<"success" | "error">("success");
   const [alertMessage, setAlertMessage] = useState("");
@@ -32,22 +34,24 @@ const InsertUserModal: React.FC<InsertUserModalProps> = ({
     type: "success" | "error";
     message: string;
   }>(null);
-  const { data: groupsData } = useGetGroupsQuery({});
 
   useEffect(() => {
     setForm({
       user_name: "",
       user_email: "",
       user_password: "",
-      fk_group_id: 0,
+      device_ip: "",
+      fk_group_id: "",
     });
+    setAlertMessage("");
+    setAlertType("success");
+    setPendingAlert(null);
   }, [isOpen]);
 
   useEffect(() => {
     if (!isOpen && pendingAlert) {
       setAlertType(pendingAlert.type);
       setAlertMessage(pendingAlert.message);
-      setShowAlert(true);
       setPendingAlert(null);
     }
   }, [isOpen, pendingAlert]);
@@ -56,15 +60,17 @@ const InsertUserModal: React.FC<InsertUserModalProps> = ({
     if (isSuccess) {
       setPendingAlert({
         type: "success",
-        message: "Usuario insertado correctamente",
+        message: "Paciente insertado correctamente",
       });
+      if (typeof refetchPatients === "function") refetchPatients();
+      onClose();
     } else if (error) {
       setPendingAlert({
         type: "error",
-        message: "Error al insertar el usuario",
+        message: "Error al insertar el paciente",
       });
     }
-  }, [isSuccess, error]);
+  }, [isSuccess, error, onClose, refetchPatients]);
 
   useEffect(() => {
     if (showAlert) {
@@ -81,98 +87,79 @@ const InsertUserModal: React.FC<InsertUserModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await insertUser({
+    setShowAlert(true);
+    await createUser({
       user_name: form.user_name,
       user_email: form.user_email,
       user_password: form.user_password,
-      fk_group_id: form.fk_group_id,
+      device_ip: form.device_ip,
+      fk_group_id: form.fk_group_id ? Number(form.fk_group_id) : undefined,
     });
-    if (typeof refetchUsers === "function") {
-      refetchUsers();
-    }
-    onClose();
   };
 
   return (
     <>
       <Modal isOpen={isOpen} onClose={onClose}>
-        <form
-          onSubmit={handleSubmit}
-          className="bg-white dark:bg-gray-900 p-6 rounded-xl shadow-lg w-full max-w-md mx-auto"
-        >
-          <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-white">
-            Insertar Usuario
-          </h2>
+        <form onSubmit={handleSubmit} className="space-y-4">
           <Input
-            type="text"
             name="user_name"
-            label="Nombre"
-            placeholder="Nombre del usuario"
+            label="Nombre del Paciente"
             value={form.user_name}
             onChange={handleChange}
             required={true}
-            className="mb-4"
+            type="text"
+            placeholder="Nombre del paciente"
           />
           <Input
-            type="email"
             name="user_email"
             label="Correo Electrónico"
-            placeholder="correo@ejemplo.com"
             value={form.user_email}
             onChange={handleChange}
             required={true}
-            className="mb-4"
+            type="email"
+            placeholder="Correo electrónico"
           />
           <Input
-            type="password"
             name="user_password"
             label="Contraseña"
-            placeholder="Contraseña"
             value={form.user_password}
             onChange={handleChange}
             required={true}
-            className="mb-4"
+            type="password"
+            placeholder="Contraseña"
           />
-          {/* Campo para fk_group_id */}
-          <div className="mb-4">
-            <label
-              htmlFor="fk_group_id"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1"
-            >
-              Grupo
-            </label>
-            <select
-              id="fk_group_id"
-              name="fk_group_id"
-              value={form.fk_group_id}
-              onChange={(e) =>
-                setForm({ ...form, fk_group_id: Number(e.target.value) })
-              }
-              required={true}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:text-white"
-            >
-              <option value="" disabled>
-                Selecciona un grupo
-              </option>
-              {Array.isArray(groupsData) &&
-                groupsData.map((group: Group) => (
-                  <option key={group.group_id} value={group.group_id}>
-                    {group.group_name}
-                  </option>
-                ))}
-            </select>
-          </div>
+          <Input
+            name="device_ip"
+            label="IP del Dispositivo"
+            value={form.device_ip}
+            onChange={handleChange}
+            required={false}
+            type="text"
+            placeholder="IP del dispositivo"
+          />
+          <Select
+            name="fk_group_id"
+            label="Grupo"
+            value={form.fk_group_id}
+            onChange={handleChange}
+            required={true}
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            options={(groupsData || []).map((g: any) => ({
+              value: g.group_id,
+              label: g.group_name,
+            }))}
+          />
           <div className="flex justify-end gap-2">
             <Button
               type="button"
               variant="secondary"
               onClick={onClose}
-              disabled={isLoading}
+              disabled={false}
             >
               Cancelar
             </Button>
             <Button type="submit" variant="primary" disabled={isLoading}>
-              {isLoading ? "Guardando..." : "Guardar"}
+              Guardar
             </Button>
           </div>
         </form>
@@ -193,4 +180,4 @@ const InsertUserModal: React.FC<InsertUserModalProps> = ({
   );
 };
 
-export default InsertUserModal;
+export default InsertPatientModal;

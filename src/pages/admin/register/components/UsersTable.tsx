@@ -29,11 +29,14 @@ const UsersTable: React.FC<UsersTableProps> = ({ data, refetchUsers }) => {
     useLazyGetUserGroupsQuery();
   const [deleteUser] = useDeleteUserMutation();
 
-  const handleInfoClick = (user_id: number) => {
+
+  const handleInfoClick = (group_id: number) => {
     setIsModalOpen(true);
     setShowDeviceIp(true);
-    setSelectedUser(data.find((u) => u.user_id === user_id) ?? null);
-    triggerGetUserGroups(user_id);
+    setSelectedUser(
+      data.find((u) => u.user_groups.group_id === group_id) ?? null
+    );
+    triggerGetUserGroups(group_id);
   };
 
   const handleEdit = (user: User) => {
@@ -99,7 +102,7 @@ const UsersTable: React.FC<UsersTableProps> = ({ data, refetchUsers }) => {
       sortable: false,
       render: (_: unknown, row: User) => (
         <Button
-          onClick={() => handleInfoClick(row.user_id)}
+          onClick={() => handleInfoClick(row.user_groups.group_id)}
           type={"button"}
           disabled={false}
           variant={"secondary"}

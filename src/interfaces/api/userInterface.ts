@@ -9,6 +9,7 @@ export interface User {
     role_name: string;
   };
   user_groups: {
+    group_id: number;
     group_name: string;
   };
 }
@@ -24,8 +25,8 @@ export interface updateUser {
   roles: {
     role_name: string;
   }
-  fk_group_id?: {
-    gruop_id: number;
+  user_groups?: {
+    group_id: string;
   };
 }
 export interface UserGroup  {
