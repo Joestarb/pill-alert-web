@@ -24,7 +24,7 @@ export interface updateUser {
   roles: {
     role_name: string;
   }
-  fk_group_id: {
+  fk_group_id?: {
     gruop_id: number;
   };
 }
