@@ -4,6 +4,7 @@ import AppLayout from "../components/layout/AppLayout";
 import Dashboard from "../pages/admin/dashboard/Dashboard";
 import Register from "../pages/admin/register/Register";
 import Groups from "../pages/admin/groups/Groups";
+import Patients from "../pages/admin/patients/Patients";
 
 export default function AdminRoutes() {
   return (
@@ -12,6 +13,8 @@ export default function AdminRoutes() {
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="register" element={<Register />} />
         <Route path="groups" element={<Groups />} />
+        <Route path="patients" element={<Patients />} />
+        
       </Route>
     </Routes>
   );

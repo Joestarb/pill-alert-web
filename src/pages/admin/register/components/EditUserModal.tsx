@@ -3,13 +3,15 @@ import Button from "../../../../components/common/Button";
 import Input from "../../../../components/common/Input";
 import Alert from "../../../../components/ui/alert/Alert";
 import { Modal } from "../../../../components/ui/modal";
-import { updateUser } from "../../../../interfaces/api/userInterface";
+import { User } from "../../../../interfaces/api/userInterface";
+import { Group } from "../../../../interfaces/groups";
+import { useGetGroupsQuery } from "../../../../services/GroupSupabase";
 import { useUpdateUserMutation } from "../../../../services/usersSupabase";
 
 interface EditUserModalProps {
   isOpen: boolean;
   onClose: () => void;
-  user: updateUser | null;
+  user: User | null;
   refetchUsers?: () => void; // Nueva prop opcional
 }
 
@@ -23,7 +25,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
     user_name: user?.user_name || "",
     user_email: user?.user_email || "",
     user_password: "",
-    fk_group_id: user?.fk_group_id || "",
+    fk_group_id: user?.user_groups?.group_id || "",
   });
   const [updateUser, { isLoading, error, isSuccess }] = useUpdateUserMutation();
   const [showAlert, setShowAlert] = useState(false);
@@ -36,12 +38,13 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
     message: string;
   }>(null);
 
+  const { data: groupsData } = useGetGroupsQuery({});
   useEffect(() => {
     setForm({
       user_name: user?.user_name || "",
       user_email: user?.user_email || "",
       user_password: "",
-      fk_group_id: user?.fk_group_id || "",
+      fk_group_id: user?.user_groups?.group_id || "",
     });
   }, [user]);
 
@@ -77,8 +80,14 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
     }
   }, [showAlert]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setForm({
+      ...form,
+      [name]: name === "fk_group_id" ? Number(value) : value,
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -89,7 +98,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
       user_name: form.user_name,
       user_email: form.user_email,
       user_password: form.user_password || undefined,
-      fk_group_id: form.fk_group_id ? Number(form.fk_group_id) : undefined,
+      fk_group_id: Number(form.fk_group_id),
     });
     if (typeof refetchUsers === "function") {
       refetchUsers();
@@ -139,19 +148,30 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
           />
           {/* Campo para fk_group_id */}
           <div className="mb-4">
-            <label htmlFor="fk_group_id" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
-              Grupo (fk_group_id)
+            <label
+              htmlFor="fk_group_id"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1"
+            >
+              Grupo
             </label>
-            <input
-              type="text"
+            <select
               id="fk_group_id"
               name="fk_group_id"
-              value={typeof form.fk_group_id === 'object' && form.fk_group_id !== null ? JSON.stringify(form.fk_group_id) : form.fk_group_id}
+              value={form.fk_group_id}
               onChange={handleChange}
               required={true}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:text-white"
-              placeholder="ID del grupo"
-            />
+            >
+              <option value="" disabled>
+                Selecciona un grupo
+              </option>
+              {Array.isArray(groupsData) &&
+                groupsData.map((group: Group) => (
+                  <option key={group.group_id} value={group.group_id}>
+                    {group.group_name}
+                  </option>
+                ))}
+            </select>
           </div>
           <div className="flex justify-end gap-2">
             <Button
