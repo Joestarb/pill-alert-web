@@ -6,8 +6,13 @@ import { useGetItemsQuery } from "../../../../services/usersSupabase";
 import UsersTable from "./UsersTable";
 
 const Users: React.FC = () => {
-  const { data: usersData = [], isLoading, error } = useGetItemsQuery("");
-  
+  const {
+    data: usersData = [],
+    isLoading,
+    error,
+    refetch,
+  } = useGetItemsQuery("");
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const users: User[] = (usersData ?? []).map((user: any) => ({
     ...user,
@@ -18,8 +23,6 @@ const Users: React.FC = () => {
   }));
 
   // Determinar si hay algún usuario que NO sea enfermero
-
-
 
   if (isLoading) return <SkeletonLoader />;
   if (error)
@@ -33,7 +36,7 @@ const Users: React.FC = () => {
 
   return (
     <div>
-      <UsersTable data={users}  />
+      <UsersTable data={users} refetchUsers={refetch} />
     </div>
   );
 };

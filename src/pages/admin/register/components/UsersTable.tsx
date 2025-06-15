@@ -8,9 +8,13 @@ import SkeletonLoader from "../../../../components/common/SkeletonLoader";
 import Table, { Column } from "../../../../components/common/Table";
 import { Modal } from "../../../../components/ui/modal";
 import { User } from "../../../../interfaces/api/userInterface";
-import { useLazyGetUserGroupsQuery } from "../../../../services/usersSupabase";
-import UserGroupsTable from "./UserGroupsTable";
+import {
+  useDeleteUserMutation,
+  useLazyGetUserGroupsQuery,
+} from "../../../../services/usersSupabase";
 import EditUserModal from "./EditUserModal";
+import InsertUserModal from "./InsertUserModal";
+import UserGroupsTable from "./UserGroupsTable";
 
 interface UserGroup {
   user_id: number;
@@ -28,21 +32,35 @@ interface UserGroup {
 
 interface UsersTableProps {
   data: User[];
+  refetchUsers?: () => void;
 }
 
-const UsersTable: React.FC<UsersTableProps> = ({ data }) => {
+const UsersTable: React.FC<UsersTableProps> = ({ data, refetchUsers }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [showDeviceIp, setShowDeviceIp] = useState<UserGroup | boolean>(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isInsertModalOpen, setIsInsertModalOpen] = useState(false);
   const [triggerGetUserGroups, { data: userGroupsData, error, isLoading }] =
     useLazyGetUserGroupsQuery();
+  const [deleteUser] = useDeleteUserMutation();
+
   if (!selectedUser) console.log("error en el fetch de datos");
   const handleInfoClick = (user_id: number) => {
     setIsModalOpen(true);
     setShowDeviceIp(true);
     setSelectedUser(data.find((u) => u.user_id === user_id) ?? null);
     triggerGetUserGroups(user_id);
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const handleDeleteUser = async (user_id: number) => {
+    try {
+      await deleteUser(user_id).unwrap();
+      refetchUsers?.();
+    } catch (error) {
+      console.error("Error al eliminar el usuario:", error);
+    }
   };
 
   const columns: Column<User>[] = [
@@ -145,6 +163,16 @@ const UsersTable: React.FC<UsersTableProps> = ({ data }) => {
             disabled={false}
             variant="cuarteatry"
             className="flex items-center"
+            onClick={async () => {
+              if (
+                window.confirm(
+                  "¿Estás seguro de que deseas eliminar este usuario?"
+                )
+              ) {
+                await deleteUser(row.user_id);
+                if (typeof refetchUsers === "function") refetchUsers();
+              }
+            }}
           >
             <FaTrash className="mr-2 text-red-500" />
           </Button>
@@ -155,6 +183,23 @@ const UsersTable: React.FC<UsersTableProps> = ({ data }) => {
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
+      {/* Botón para abrir el modal de inserción de usuario */}
+      <div className="flex justify-end mb-4">
+        <Button
+          disabled={false}
+          type="button"
+          variant="primary"
+          onClick={() => setIsInsertModalOpen(true)}
+        >
+          Nuevo Usuario
+        </Button>
+      </div>
+      {/* Modal de inserción de usuario */}
+      <InsertUserModal
+        isOpen={isInsertModalOpen}
+        onClose={() => setIsInsertModalOpen(false)}
+        refetchUsers={refetchUsers}
+      />
       <Modal
         isOpen={isModalOpen}
         onClose={() => {
@@ -174,7 +219,7 @@ const UsersTable: React.FC<UsersTableProps> = ({ data }) => {
                 patients: null,
               }))}
             />
-           )}
+          )}
         </div>
       </Modal>
       {/* Modal de edición de usuario */}
@@ -182,6 +227,7 @@ const UsersTable: React.FC<UsersTableProps> = ({ data }) => {
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
         user={selectedUser}
+        refetchUsers={refetchUsers}
       />
       <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">
         Lista de Usuarios

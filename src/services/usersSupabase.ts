@@ -86,11 +86,61 @@ export const supabaseApi = createApi({
         return { data, error: undefined };
       },
     }),
+    DeleteUser: builder.mutation({
+      queryFn: async (user_id: number) => {
+        const { data, error } = await supabase
+          .from("users")
+          .update({ deleted: 1 })
+          .eq("user_id", user_id)
+          .select();
+
+        if (error) {
+          return {
+            error: { status: 400, data: { message: error.message } },
+            data: undefined,
+          };
+        }
+        return { data, error: undefined };
+      },
+    }),
+    InsertUser: builder.mutation({
+      queryFn: async ({
+        user_name,
+        user_email,
+        user_password,
+        fk_group_id,
+      }: {
+        user_name: string;
+        user_email: string;
+        user_password: string;
+        fk_group_id?: number;
+      }) => {
+        const { data, error } = await supabase
+          .from("users")
+          .insert({
+            user_name,
+            user_email,
+            user_password: hashPassword(user_password, HASH_SECRET_KEY),
+            fk_group_id,
+            fk_role_id: 1,
+          })
+          .select();
+
+        if (error) {
+          return {
+            error: { status: 400, data: { message: error.message } },
+            data: undefined,
+          };
+        }
+        return { data, error: undefined };
+      }
+    }),
   }),
 });
-
 export const {
   useGetItemsQuery,
   useLazyGetUserGroupsQuery,
   useUpdateUserMutation,
+  useDeleteUserMutation,
+  useInsertUserMutation,
 } = supabaseApi;

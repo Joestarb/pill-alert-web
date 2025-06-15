@@ -3,34 +3,29 @@ import Button from "../../../../components/common/Button";
 import Input from "../../../../components/common/Input";
 import Alert from "../../../../components/ui/alert/Alert";
 import { Modal } from "../../../../components/ui/modal";
-import { updateUser } from "../../../../interfaces/api/userInterface";
-import { useUpdateUserMutation } from "../../../../services/usersSupabase";
+import { useInsertUserMutation } from "../../../../services/usersSupabase";
 
-interface EditUserModalProps {
+interface InsertUserModalProps {
   isOpen: boolean;
   onClose: () => void;
-  user: updateUser | null;
-  refetchUsers?: () => void; // Nueva prop opcional
+  refetchUsers?: () => void;
 }
 
-const EditUserModal: React.FC<EditUserModalProps> = ({
+const InsertUserModal: React.FC<InsertUserModalProps> = ({
   isOpen,
   onClose,
-  user,
-  refetchUsers, // Desestructuramos la nueva prop
+  refetchUsers,
 }) => {
   const [form, setForm] = useState({
-    user_name: user?.user_name || "",
-    user_email: user?.user_email || "",
+    user_name: "",
+    user_email: "",
     user_password: "",
-    fk_group_id: user?.fk_group_id || "",
+    fk_group_id: 0,
   });
-  const [updateUser, { isLoading, error, isSuccess }] = useUpdateUserMutation();
+  const [insertUser, { isLoading, error, isSuccess }] = useInsertUserMutation();
   const [showAlert, setShowAlert] = useState(false);
   const [alertType, setAlertType] = useState<"success" | "error">("success");
   const [alertMessage, setAlertMessage] = useState("");
-
-  // Nuevo estado para controlar si se debe mostrar el alert después de cerrar el modal
   const [pendingAlert, setPendingAlert] = useState<null | {
     type: "success" | "error";
     message: string;
@@ -38,14 +33,13 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
 
   useEffect(() => {
     setForm({
-      user_name: user?.user_name || "",
-      user_email: user?.user_email || "",
+      user_name: "",
+      user_email: "",
       user_password: "",
-      fk_group_id: user?.fk_group_id || "",
+      fk_group_id: 0,
     });
-  }, [user]);
+  }, [isOpen]);
 
-  // Mostrar alert solo cuando el modal ya está cerrado
   useEffect(() => {
     if (!isOpen && pendingAlert) {
       setAlertType(pendingAlert.type);
@@ -55,17 +49,16 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
     }
   }, [isOpen, pendingAlert]);
 
-  // Ya no mostramos el alert aquí directamente
   useEffect(() => {
     if (isSuccess) {
       setPendingAlert({
         type: "success",
-        message: "Usuario actualizado correctamente",
+        message: "Usuario insertado correctamente",
       });
     } else if (error) {
       setPendingAlert({
         type: "error",
-        message: "Error al actualizar el usuario",
+        message: "Error al insertar el usuario",
       });
     }
   }, [isSuccess, error]);
@@ -77,19 +70,19 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
     }
   }, [showAlert]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return;
-    await updateUser({
-      user_id: user.user_id,
+    await insertUser({
       user_name: form.user_name,
       user_email: form.user_email,
-      user_password: form.user_password || undefined,
-      fk_group_id: form.fk_group_id ? Number(form.fk_group_id) : undefined,
+      user_password: form.user_password,
+      fk_group_id: form.fk_group_id,
     });
     if (typeof refetchUsers === "function") {
       refetchUsers();
@@ -105,7 +98,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
           className="bg-white dark:bg-gray-900 p-6 rounded-xl shadow-lg w-full max-w-md mx-auto"
         >
           <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-white">
-            Editar Usuario
+            Insertar Usuario
           </h2>
           <Input
             type="text"
@@ -130,16 +123,19 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
           <Input
             type="password"
             name="user_password"
-            label="Contraseña (opcional)"
-            placeholder="Dejar en blanco para no cambiar"
+            label="Contraseña"
+            placeholder="Contraseña"
             value={form.user_password}
             onChange={handleChange}
-            required={false}
+            required={true}
             className="mb-4"
           />
           {/* Campo para fk_group_id */}
           <div className="mb-4">
-            <label htmlFor="fk_group_id" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
+            <label
+              htmlFor="fk_group_id"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1"
+            >
               Grupo (fk_group_id)
             </label>
             <input
@@ -184,4 +180,4 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
   );
 };
 
-export default EditUserModal;
+export default InsertUserModal;
