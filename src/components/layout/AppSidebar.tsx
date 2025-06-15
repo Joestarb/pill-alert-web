@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
-  BiCalendar,
   BiChevronDown,
   BiDotsHorizontal,
   BiFirstPage,
@@ -17,12 +16,17 @@ const navItems: NavItem[] = [
   {
     icon: <BiGrid />,
     name: "Dashboard",
-    subItems: [{ name: "Ecommerce", path: "/", pro: false }],
+    subItems: [{ name: "Ecommerce", path: "/" }],
   },
   {
-    icon: <BiCalendar />,
-    name: "Calendar",
-    path: "/calendar",
+    icon: <BiUser />,
+    name: "Enfermeros",
+    subItems: [
+      { name: "Consulta", path: "/admin/register" },
+      { name: "Calendario", path: "/admin/calendar" }
+
+    ],
+  
   },
   {
     icon: <BiUser />,
@@ -32,19 +36,19 @@ const navItems: NavItem[] = [
   {
     name: "Forms",
     icon: <BiListCheck />,
-    subItems: [{ name: "Form Elements", path: "/form-elements", pro: false }],
+    subItems: [{ name: "Form Elements", path: "/form-elements" }],
   },
   {
     name: "Tables",
     icon: <BiTable />,
-    subItems: [{ name: "Basic Tables", path: "/basic-tables", pro: false }],
+    subItems: [{ name: "Basic Tables", path: "/basic-tables" }],
   },
   {
     name: "Pages",
     icon: <BiFirstPage />,
     subItems: [
-      { name: "Blank Page", path: "/blank", pro: false },
-      { name: "404 Error", path: "/error-404", pro: false },
+      { name: "Blank Page", path: "/blank" },
+      { name: "404 Error", path: "/error-404" },
     ],
   },
 ];
@@ -205,7 +209,7 @@ const AppSidebar: React.FC = () => {
                       to={subItem.path}
                       className={`flex items-center justify-between px-3 py-2 text-sm rounded-md transition-colors duration-200 ${
                         isActive(subItem.path)
-                          ? "bg-blue-100 text-blue-700 font-medium"
+                          ? "bg-blue-100 text-blue-700 dark:bg-[#162042] font-medium"
                           : "text-gray-600 hover:bg-gray-100 dark:text-white dark:hover:bg-[#162042]"
                       }`}
                     >

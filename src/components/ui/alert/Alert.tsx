@@ -21,23 +21,23 @@ const Alert: React.FC<AlertProps> = ({
   const variantClasses = {
     success: {
       container:
-        "border-success-500 bg-success-50 dark:border-success-500/30 dark:bg-success-500/15",
-      icon: "text-success-500",
+        "m-12 bg-green-50 dark:bg-green-900/30 border-l-4 border-green-500 dark:border-green-400 text-green-700 dark:text-green-100 p-4 rounded-md shadow-sm",
+      icon: "text-green-500 dark:text-green-400",
     },
     error: {
       container:
-        "border-error-500 bg-error-50 dark:border-error-500/30 dark:bg-error-500/15",
+        "m-12 bg-red-50 dark:bg-red-900/30 border-l-4 border-red-500 dark:border-red-400 text-red-700 dark:text-red-100 p-4 rounded-md shadow-sm",
       icon: "text-error-500",
     },
     warning: {
       container:
-        "border-warning-500 bg-warning-50 dark:border-warning-500/30 dark:bg-warning-500/15",
-      icon: "text-warning-500",
+        "m-12 bg-yellow-50 dark:bg-yellow-900/30 border-l-4 border-yellow-500 dark:border-yellow-400 text-yellow-700 dark:text-yellow-100 p-4 rounded-md shadow-sm",
+      icon: "text-yellow-500 dark:text-yellow-400",
     },
     info: {
       container:
-        "border-blue-light-500 bg-blue-light-50 dark:border-blue-light-500/30 dark:bg-blue-light-500/15",
-      icon: "text-blue-light-500",
+        "m-12 bg-blue-50 dark:bg-blue-900/30 border-l-4 border-blue-500 dark:border-blue-400 text-blue-700 dark:text-blue-100 p-4 rounded-md shadow-sm",
+      icon: "text-blue-500 dark:text-blue-400",
     },
   };
 
@@ -45,7 +45,7 @@ const Alert: React.FC<AlertProps> = ({
   const icons = {
     success: (
       <svg
-        className="fill-current"
+        className="fill-current "
         width="24"
         height="24"
         viewBox="0 0 24 24"

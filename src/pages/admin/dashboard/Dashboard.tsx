@@ -1,8 +1,9 @@
 import React from 'react'
+import DashboardUI from './components/admin/DashboardUI'
 
 const Dashboard = () => {
   return (
-    <div>Dashboard</div>
+    <DashboardUI />
   )
 }
 

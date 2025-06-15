@@ -1,9 +1,16 @@
-import React from 'react'
+import React from "react";
 
-const Register = () => {
+import Users from "./components/Users";
+const Register: React.FC = () => {
+
+
   return (
-    <div>Register</div>
-  )
-}
+    <div>
+    
 
-export default Register
+        <Users/>
+    </div>
+  );
+};
+
+export default Register;

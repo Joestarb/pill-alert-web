@@ -15,5 +15,5 @@ export interface ButtonProps {
   type: 'button' | 'submit' | 'reset';
   className?: string;
   disabled: boolean;
-  variant: 'primary' | 'secondary' | 'tertiary';
+  variant: 'primary' | 'secondary' | 'tertiary'|'cuarteatry';
 }
