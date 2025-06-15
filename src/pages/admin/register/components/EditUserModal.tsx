@@ -146,7 +146,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
               type="text"
               id="fk_group_id"
               name="fk_group_id"
-              value={form.fk_group_id}
+              value={typeof form.fk_group_id === 'object' && form.fk_group_id !== null ? JSON.stringify(form.fk_group_id) : form.fk_group_id}
               onChange={handleChange}
               required={true}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:text-white"

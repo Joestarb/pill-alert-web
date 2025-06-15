@@ -6,8 +6,6 @@ const Register: React.FC = () => {
 
   return (
     <div>
-    
-
         <Users/>
     </div>
   );
