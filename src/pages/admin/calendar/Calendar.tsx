@@ -170,7 +170,7 @@ const Calendar: React.FC = () => {
 
         {/* Instrucciones */}
         <div className="mt-6 bg-white border border-indigo-100 rounded-lg p-5 shadow-sm">
-          <h3 className="font-semibold text-blue-800 mb-3 text-lg">ℹ️ Instrucciones:</h3>
+          <h3 className="font-semibold text-blue-800 mb-3 text-lg">Instrucciones:</h3>
           <ul className="text-gray-700 text-sm space-y-2 list-disc list-inside">
             <li>Haz clic en una fecha para crear un nuevo evento.</li>
             <li>Haz clic en un evento para eliminarlo.</li>
