@@ -25,15 +25,11 @@ const InsertPatientModal: React.FC<InsertPatientModalProps> = ({
     device_ip: "",
     fk_group_id: "",
   });
+
   const { data: groupsData } = useGetGroupsQuery({});
   const [createUser, { isLoading, error, isSuccess }] = useInsertUserMutation();
-  const [showAlert, setShowAlert] = useState(false);
-  const [alertType, setAlertType] = useState<"success" | "error">("success");
-  const [alertMessage, setAlertMessage] = useState("");
-  const [pendingAlert, setPendingAlert] = useState<null | {
-    type: "success" | "error";
-    message: string;
-  }>(null);
+  const [alert, setAlert] = useState<null | { type: "success" | "error"; message: string }>(null);
+  const [pendingAlert, setPendingAlert] = useState<typeof alert>(null);
 
   useEffect(() => {
     setForm({
@@ -43,15 +39,13 @@ const InsertPatientModal: React.FC<InsertPatientModalProps> = ({
       device_ip: "",
       fk_group_id: "",
     });
-    setAlertMessage("");
-    setAlertType("success");
+    setAlert(null);
     setPendingAlert(null);
   }, [isOpen]);
 
   useEffect(() => {
     if (!isOpen && pendingAlert) {
-      setAlertType(pendingAlert.type);
-      setAlertMessage(pendingAlert.message);
+      setAlert(pendingAlert);
       setPendingAlert(null);
     }
   }, [isOpen, pendingAlert]);
@@ -73,11 +67,11 @@ const InsertPatientModal: React.FC<InsertPatientModalProps> = ({
   }, [isSuccess, error, onClose, refetchPatients]);
 
   useEffect(() => {
-    if (showAlert) {
-      const timer = setTimeout(() => setShowAlert(false), 5000);
+    if (alert) {
+      const timer = setTimeout(() => setAlert(null), 5000);
       return () => clearTimeout(timer);
     }
-  }, [showAlert]);
+  }, [alert]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -87,7 +81,6 @@ const InsertPatientModal: React.FC<InsertPatientModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setShowAlert(true);
     await createUser({
       user_name: form.user_name,
       user_email: form.user_email,
@@ -100,34 +93,39 @@ const InsertPatientModal: React.FC<InsertPatientModalProps> = ({
   return (
     <>
       <Modal isOpen={isOpen} onClose={onClose}>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 p-2">
+          <h2 className="text-xl font-semibold">Registrar Paciente</h2>
+
           <Input
             name="user_name"
             label="Nombre del Paciente"
             value={form.user_name}
             onChange={handleChange}
-            required={true}
+            required
             type="text"
             placeholder="Nombre del paciente"
           />
+
           <Input
             name="user_email"
             label="Correo Electrónico"
             value={form.user_email}
             onChange={handleChange}
-            required={true}
+            required
             type="email"
             placeholder="Correo electrónico"
           />
+
           <Input
             name="user_password"
             label="Contraseña"
             value={form.user_password}
             onChange={handleChange}
-            required={true}
+            required
             type="password"
             placeholder="Contraseña"
           />
+
           <Input
             name="device_ip"
             label="IP del Dispositivo"
@@ -137,19 +135,20 @@ const InsertPatientModal: React.FC<InsertPatientModalProps> = ({
             type="text"
             placeholder="IP del dispositivo"
           />
+
           <Select
             name="fk_group_id"
             label="Grupo"
             value={form.fk_group_id}
             onChange={handleChange}
-            required={true}
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            required
             options={(groupsData || []).map((g: any) => ({
               value: g.group_id,
               label: g.group_name,
             }))}
           />
-          <div className="flex justify-end gap-2">
+
+          <div className="flex justify-end gap-2 pt-2">
             <Button
               type="button"
               variant="secondary"
@@ -164,15 +163,16 @@ const InsertPatientModal: React.FC<InsertPatientModalProps> = ({
           </div>
         </form>
       </Modal>
-      {showAlert && (
+
+      {alert && (
         <div
           className="fixed bottom-6 right-6 z-50 cursor-pointer"
-          onClick={() => setShowAlert(false)}
+          onClick={() => setAlert(null)}
         >
           <Alert
-            variant={alertType}
-            title={alertType === "success" ? "Éxito" : "Error"}
-            message={alertMessage}
+            variant={alert.type}
+            title={alert.type === "success" ? "Éxito" : "Error"}
+            message={alert.message}
           />
         </div>
       )}

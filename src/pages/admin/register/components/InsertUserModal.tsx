@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Button from "../../../../components/common/Button";
 import Input from "../../../../components/common/Input";
+import Select from "../../../../components/common/Select";
 import Alert from "../../../../components/ui/alert/Alert";
 import { Modal } from "../../../../components/ui/modal";
 import { Group } from "../../../../interfaces/groups";
@@ -22,8 +23,9 @@ const InsertUserModal: React.FC<InsertUserModalProps> = ({
     user_name: "",
     user_email: "",
     user_password: "",
-    fk_group_id: 0,
+    fk_group_id: "",
   });
+
   const [insertUser, { isLoading, error, isSuccess }] = useInsertUserMutation();
   const [showAlert, setShowAlert] = useState(false);
   const [alertType, setAlertType] = useState<"success" | "error">("success");
@@ -32,6 +34,7 @@ const InsertUserModal: React.FC<InsertUserModalProps> = ({
     type: "success" | "error";
     message: string;
   }>(null);
+
   const { data: groupsData } = useGetGroupsQuery({});
 
   useEffect(() => {
@@ -39,7 +42,7 @@ const InsertUserModal: React.FC<InsertUserModalProps> = ({
       user_name: "",
       user_email: "",
       user_password: "",
-      fk_group_id: 0,
+      fk_group_id: "",
     });
   }, [isOpen]);
 
@@ -85,11 +88,10 @@ const InsertUserModal: React.FC<InsertUserModalProps> = ({
       user_name: form.user_name,
       user_email: form.user_email,
       user_password: form.user_password,
-      fk_group_id: form.fk_group_id,
+      fk_group_id: Number(form.fk_group_id),
     });
-    if (typeof refetchUsers === "function") {
-      refetchUsers();
-    }
+
+    if (typeof refetchUsers === "function") refetchUsers();
     onClose();
   };
 
@@ -98,71 +100,53 @@ const InsertUserModal: React.FC<InsertUserModalProps> = ({
       <Modal isOpen={isOpen} onClose={onClose}>
         <form
           onSubmit={handleSubmit}
-          className="bg-white dark:bg-gray-900 p-6 rounded-xl shadow-lg w-full max-w-md mx-auto"
+          className="w-full max-w-lg mx-auto p-4 sm:p-6 space-y-5"
         >
-          <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-white">
+          <h2 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-white">
             Insertar Usuario
           </h2>
-          <Input
-            type="text"
-            name="user_name"
-            label="Nombre"
-            placeholder="Nombre del usuario"
-            value={form.user_name}
-            onChange={handleChange}
-            required={true}
-            className="mb-4"
-          />
-          <Input
-            type="email"
-            name="user_email"
-            label="Correo Electrónico"
-            placeholder="correo@ejemplo.com"
-            value={form.user_email}
-            onChange={handleChange}
-            required={true}
-            className="mb-4"
-          />
-          <Input
-            type="password"
-            name="user_password"
-            label="Contraseña"
-            placeholder="Contraseña"
-            value={form.user_password}
-            onChange={handleChange}
-            required={true}
-            className="mb-4"
-          />
-          {/* Campo para fk_group_id */}
-          <div className="mb-4">
-            <label
-              htmlFor="fk_group_id"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1"
-            >
-              Grupo
-            </label>
-            <select
-              id="fk_group_id"
+
+          <div className="space-y-4">
+            <Input
+              name="user_name"
+              label="Nombre"
+              placeholder="Nombre del usuario"
+              value={form.user_name}
+              onChange={handleChange}
+              required
+            />
+            <Input
+              name="user_email"
+              label="Correo Electrónico"
+              placeholder="correo@ejemplo.com"
+              value={form.user_email}
+              onChange={handleChange}
+              required
+              type="email"
+            />
+            <Input
+              name="user_password"
+              label="Contraseña"
+              placeholder="Contraseña"
+              value={form.user_password}
+              onChange={handleChange}
+              required
+              type="password"
+            />
+            <Select
               name="fk_group_id"
+              label="Grupo"
               value={form.fk_group_id}
-              onChange={(e) =>
-                setForm({ ...form, fk_group_id: Number(e.target.value) })
-              }
-              required={true}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200 dark:bg-gray-800 dark:text-white"
-            >
-              <option value="" disabled>
-                Selecciona un grupo
-              </option>
-              {Array.isArray(groupsData) &&
-                groupsData.map((group: Group) => (
-                  <option key={group.group_id} value={group.group_id}>
-                    {group.group_name}
-                  </option>
-                ))}
-            </select>
+              onChange={handleChange}
+              required
+              options={(groupsData || []).map((group: Group) => ({
+                value: group.group_id,
+                label: group.group_name,
+              }))}
+            />
           </div>
-          <div className="flex justify-end gap-2">
+
+          <div className="flex justify-end gap-2 pt-4">
             <Button
               type="button"
               variant="secondary"
@@ -177,6 +161,7 @@ const InsertUserModal: React.FC<InsertUserModalProps> = ({
           </div>
         </form>
       </Modal>
+
       {showAlert && (
         <div
           className="fixed bottom-6 right-6 z-50 cursor-pointer"

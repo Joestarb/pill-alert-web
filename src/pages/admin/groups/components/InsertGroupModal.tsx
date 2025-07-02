@@ -19,13 +19,11 @@ const InsertGroupModal: React.FC<InsertGroupModalProps> = ({
   onClose,
   refetchGroups,
 }) => {
-  const [form, setForm] = useState({
-    group_name: "",
-  });
-  const { refetch } = useGetGroupsQuery({});
+  const [form, setForm] = useState({ group_name: "" });
 
-  const [createGroup, { isLoading, error, isSuccess }] =
-    useCreateGroupMutation();
+  const { refetch } = useGetGroupsQuery({});
+  const [createGroup, { isLoading, error, isSuccess }] = useCreateGroupMutation();
+
   const [showAlert, setShowAlert] = useState(false);
   const [alertType, setAlertType] = useState<"success" | "error">("success");
   const [alertMessage, setAlertMessage] = useState("");
@@ -45,10 +43,10 @@ const InsertGroupModal: React.FC<InsertGroupModalProps> = ({
     if (!isOpen && pendingAlert) {
       setAlertType(pendingAlert.type);
       setAlertMessage(pendingAlert.message);
+      setShowAlert(true);
       setPendingAlert(null);
-     
     }
-  }, [isOpen, pendingAlert, setShowAlert]);
+  }, [isOpen, pendingAlert]);
 
   useEffect(() => {
     if (isSuccess) {
@@ -73,44 +71,54 @@ const InsertGroupModal: React.FC<InsertGroupModalProps> = ({
       return () => clearTimeout(timer);
     }
   }, [showAlert]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-      setShowAlert(true);
+    setShowAlert(true);
     await createGroup(form.group_name);
   };
 
   return (
     <>
       <Modal isOpen={isOpen} onClose={onClose}>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form
+          onSubmit={handleSubmit}
+          className="w-full max-w-lg mx-auto p-4 sm:p-6 space-y-5"
+        >
+          <h2 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-white">
+            Insertar Grupo
+          </h2>
+
           <Input
             name="group_name"
             label="Nombre del Grupo"
             value={form.group_name}
             onChange={handleChange}
-            required={true}
+            required
             type="text"
             placeholder="Nombre del grupo"
           />
-          <div className="flex justify-end gap-2">
+
+          <div className="flex justify-end gap-2 pt-2">
             <Button
               type="button"
               variant="secondary"
               onClick={onClose}
-              disabled={false}
+              disabled={isLoading}
             >
               Cancelar
             </Button>
             <Button type="submit" variant="primary" disabled={isLoading}>
-              Guardar
+              {isLoading ? "Guardando..." : "Guardar"}
             </Button>
           </div>
         </form>
       </Modal>
+
       {showAlert && (
         <div
           className="fixed bottom-6 right-6 z-50 cursor-pointer"

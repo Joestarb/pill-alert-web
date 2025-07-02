@@ -3,6 +3,7 @@ import { hashPassword } from "../utils/hashPassword";
 import supabase from "../utils/supabase";
 
 const HASH_SECRET_KEY = import.meta.env.VITE_HASH_SECRET_KEY;
+
 export const supabasePatientsbaseApi = createApi({
   reducerPath: "supabasePatientsbaseApi",
   tagTypes: ["Item"],
@@ -20,10 +21,9 @@ export const supabasePatientsbaseApi = createApi({
           .order("created_at", { ascending: false });
         return { data };
       },
-      // Mantiene los datos en caché por 5 minutos (300 segundos)
       keepUnusedDataFor: 300,
     }),
-  
+
     UpdateUser: builder.mutation({
       queryFn: async ({
         user_id,
@@ -67,6 +67,7 @@ export const supabasePatientsbaseApi = createApi({
         return { data, error: undefined };
       },
     }),
+
     DeleteUser: builder.mutation({
       queryFn: async (user_id: number) => {
         const { data, error } = await supabase
@@ -84,6 +85,7 @@ export const supabasePatientsbaseApi = createApi({
         return { data, error: undefined };
       },
     }),
+
     InsertUser: builder.mutation({
       queryFn: async ({
         user_name,
@@ -121,9 +123,71 @@ export const supabasePatientsbaseApi = createApi({
     }),
   }),
 });
+
+// Hooks de Redux
 export const {
   useGetItemsQuery,
   useUpdateUserMutation,
   useDeleteUserMutation,
   useInsertUserMutation,
 } = supabasePatientsbaseApi;
+
+// 🚨 Funciones fuera de Redux Toolkit (usadas directamente por componentes)
+
+export const getMedications = async () => {
+  const { data, error } = await supabase
+    .from("medications")
+    .select("medications_id, medications");
+
+  if (error) {
+    console.error("Error al obtener medicamentos:", error.message);
+    return [];
+  }
+
+  return data || [];
+};
+
+export const assignMedicationToUser = async (
+  userId: number,
+  medicationId: number,
+  scheduleId: number = 1 // puedes pasar otro si luego lo haces dinámico
+) => {
+  // 1. Verificar si ya existe
+  const { data: existing, error: checkError } = await supabase
+    .from("medication_consumed")
+    .select("medication_consumed_id") // o el nombre de tu PK
+    .eq("fk_user_id", userId)
+    .eq("fk_medication_id", medicationId)
+    .eq("fk_schedule_id", scheduleId)
+    .eq("deleted", 0)
+    .maybeSingle();
+
+  if (checkError) {
+    console.error("Error al verificar duplicado:", checkError.message);
+    throw checkError;
+  }
+
+  if (existing) {
+    console.warn("Este medicamento ya fue asignado a este paciente con este horario.");
+    throw new Error("Este medicamento ya está asignado con ese horario.");
+  }
+
+  // 2. Insertar si no existe
+  const { data, error } = await supabase.from("medication_consumed").insert([
+    {
+      fk_user_id: userId,
+      fk_medication_id: medicationId,
+      fk_schedule_id: scheduleId,
+      created_at: new Date().toISOString(),
+      deleted: 0,
+    },
+  ]);
+
+  if (error) {
+    console.error("Error al asignar medicamento:", error.message);
+    throw error;
+  }
+
+  return data;
+};
+

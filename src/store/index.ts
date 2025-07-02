@@ -3,12 +3,14 @@ import { supabaseApi } from "../services/usersSupabase";
 import themeReducer from "../slices/themeSlice";
 import { supabaseGroupApi } from "../services/GroupSupabase";
 import { supabasePatientsbaseApi } from "../services/patientsSupabase";
+import { medicationsSupabaseApi } from "../services/medicationsSupabase";
 export const store = configureStore({
   reducer: {
     theme: themeReducer,
     [supabaseApi.reducerPath]: supabaseApi.reducer,
     [supabaseGroupApi.reducerPath]: supabaseGroupApi.reducer,
     [supabasePatientsbaseApi.reducerPath]: supabasePatientsbaseApi.reducer,
+    [medicationsSupabaseApi.reducerPath]: medicationsSupabaseApi.reducer,
 
   },
   middleware: (getDefaultMiddleware) =>
@@ -16,6 +18,7 @@ export const store = configureStore({
       supabaseApi.middleware,
       supabaseGroupApi.middleware,
       supabasePatientsbaseApi.middleware,
+      medicationsSupabaseApi.middleware,
     ),
 });
 

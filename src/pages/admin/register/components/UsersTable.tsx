@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from "react";
 import { FiCpu, FiMail, FiShield, FiUser, FiUsers } from "react-icons/fi";
 import Button from "../../../../components/common/Button";
@@ -28,7 +27,6 @@ const UsersTable: React.FC<UsersTableProps> = ({ data, refetchUsers }) => {
   const [triggerGetUserGroups, { data: userGroupsData, error, isLoading }] =
     useLazyGetUserGroupsQuery();
   const [deleteUser] = useDeleteUserMutation();
-
 
   const handleInfoClick = (group_id: number) => {
     setIsModalOpen(true);
@@ -103,9 +101,8 @@ const UsersTable: React.FC<UsersTableProps> = ({ data, refetchUsers }) => {
       render: (_: unknown, row: User) => (
         <Button
           onClick={() => handleInfoClick(row.user_groups.group_id)}
-          type={"button"}
-          disabled={false}
-          variant={"secondary"}
+          type="button"
+          variant="secondary"
         >
           Info
         </Button>
@@ -129,10 +126,12 @@ const UsersTable: React.FC<UsersTableProps> = ({ data, refetchUsers }) => {
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
-      {/* Botón para abrir el modal de inserción de usuario */}
-      <div className="flex justify-end mb-4">
+      {/* Header */}
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
+          Lista de Usuarios
+        </h2>
         <Button
-          disabled={false}
           type="button"
           variant="primary"
           onClick={() => setIsInsertModalOpen(true)}
@@ -140,12 +139,30 @@ const UsersTable: React.FC<UsersTableProps> = ({ data, refetchUsers }) => {
           Nuevo Usuario
         </Button>
       </div>
-      {/* Modal de inserción de usuario */}
+
+      {/* Tabla */}
+      <Table
+        columns={columns}
+        data={data}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+        className="border border-gray-200"
+      />
+
+      {/* Modales */}
       <InsertUserModal
         isOpen={isInsertModalOpen}
         onClose={() => setIsInsertModalOpen(false)}
         refetchUsers={refetchUsers}
       />
+
+      <EditUserModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        user={selectedUser}
+        refetchUsers={refetchUsers}
+      />
+
       <Modal
         isOpen={isModalOpen}
         onClose={() => {
@@ -153,10 +170,10 @@ const UsersTable: React.FC<UsersTableProps> = ({ data, refetchUsers }) => {
           setShowDeviceIp(false);
         }}
       >
-        <div className="p-6">
-          <p>Contenido del modal...</p>
+        <div className="p-4 space-y-4">
+          <h2 className="text-lg font-semibold text-gray-700">Pacientes del Grupo</h2>
           {isLoading && <SkeletonLoader />}
-          {error && <p>Error al cargar datos</p>}
+          {error && <p className="text-red-600">Error al cargar datos</p>}
           {userGroupsData && (
             <UserGroupsTable
               data={userGroupsData.map((user: any) => ({
@@ -168,23 +185,6 @@ const UsersTable: React.FC<UsersTableProps> = ({ data, refetchUsers }) => {
           )}
         </div>
       </Modal>
-      {/* Modal de edición de usuario */}
-      <EditUserModal
-        isOpen={isEditModalOpen}
-        onClose={() => setIsEditModalOpen(false)}
-        user={selectedUser}
-        refetchUsers={refetchUsers}
-      />
-      <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">
-        Lista de Usuarios
-      </h2>
-      <Table
-        columns={columns}
-        data={data}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-        className="border border-gray-200"
-      />
     </div>
   );
 };

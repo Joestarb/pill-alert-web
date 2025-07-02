@@ -27,66 +27,53 @@ const EditPatientModal: React.FC<EditPatientModalProps> = ({
   refetchPatients,
 }) => {
   const [form, setForm] = useState({
-    user_name: patient?.user_name || "",
-    user_email: patient?.user_email || "",
-    device_ip: patient?.device_ip || "",
-    fk_group_id: patient?.fk_group_id ? String(patient.fk_group_id) : "",
+    user_name: "",
+    user_email: "",
+    device_ip: "",
+    fk_group_id: "",
   });
-  const [updateUser, { isLoading, error, isSuccess }] = useUpdateUserMutation();
-  const [showAlert, setShowAlert] = useState(false);
-  const [alertType, setAlertType] = useState<"success" | "error">("success");
-  const [alertMessage, setAlertMessage] = useState("");
-  const [pendingAlert, setPendingAlert] = useState<null | {
-    type: "success" | "error";
-    message: string;
-  }>(null);
+
   const { data: groupsData } = useGetGroupsQuery({});
+  const [updateUser, { isLoading, error, isSuccess }] = useUpdateUserMutation();
+  const [alert, setAlert] = useState<null | { type: "success" | "error"; message: string }>(null);
+  const [pendingAlert, setPendingAlert] = useState<typeof alert>(null);
 
   useEffect(() => {
-    setForm({
-      user_name: patient?.user_name || "",
-      user_email: patient?.user_email || "",
-      device_ip: patient?.device_ip || "",
-      fk_group_id: patient?.fk_group_id ? String(patient.fk_group_id) : "",
-    });
-    setAlertMessage("");
-    setAlertType("success");
+    if (patient) {
+      setForm({
+        user_name: patient.user_name || "",
+        user_email: patient.user_email || "",
+        device_ip: patient.device_ip || "",
+        fk_group_id: patient.fk_group_id ? String(patient.fk_group_id) : "",
+      });
+    }
+    setAlert(null);
     setPendingAlert(null);
   }, [patient, isOpen]);
 
   useEffect(() => {
     if (!isOpen && pendingAlert) {
-      setAlertType(pendingAlert.type);
-      setAlertMessage(pendingAlert.message);
+      setAlert(pendingAlert);
       setPendingAlert(null);
-      setTimeout(() => {
-        setShowAlert(false);
-      }, 3000);
     }
   }, [isOpen, pendingAlert]);
 
   useEffect(() => {
-    if (showAlert) {
-      const timer = setTimeout(() => setShowAlert(false), 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [showAlert]);
-
-  useEffect(() => {
     if (isSuccess) {
-      setPendingAlert({
-        type: "success",
-        message: "Paciente actualizado correctamente",
-      });
+      setPendingAlert({ type: "success", message: "Paciente actualizado correctamente" });
       if (typeof refetchPatients === "function") refetchPatients();
       onClose();
     } else if (error) {
-      setPendingAlert({
-        type: "error",
-        message: "Error al actualizar el paciente",
-      });
+      setPendingAlert({ type: "error", message: "Error al actualizar el paciente" });
     }
   }, [isSuccess, error, onClose, refetchPatients]);
+
+  useEffect(() => {
+    if (alert) {
+      const timer = setTimeout(() => setAlert(null), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [alert]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -95,7 +82,6 @@ const EditPatientModal: React.FC<EditPatientModalProps> = ({
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    setShowAlert(true);
     e.preventDefault();
     if (patient) {
       await updateUser({
@@ -111,25 +97,29 @@ const EditPatientModal: React.FC<EditPatientModalProps> = ({
   return (
     <>
       <Modal isOpen={isOpen} onClose={onClose}>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 p-2">
+          <h2 className="text-xl font-semibold">Editar Paciente</h2>
+
           <Input
             name="user_name"
             label="Nombre del Paciente"
             value={form.user_name}
             onChange={handleChange}
-            required={true}
+            required
             type="text"
             placeholder="Nombre del paciente"
           />
+
           <Input
             name="user_email"
             label="Correo Electrónico"
             value={form.user_email}
             onChange={handleChange}
-            required={true}
+            required
             type="email"
             placeholder="Correo electrónico"
           />
+
           <Input
             name="device_ip"
             label="IP del Dispositivo"
@@ -139,12 +129,13 @@ const EditPatientModal: React.FC<EditPatientModalProps> = ({
             type="text"
             placeholder="IP del dispositivo"
           />
+
           <Select
             name="fk_group_id"
             label="Grupo"
             value={form.fk_group_id}
             onChange={handleChange}
-            required={true}
+            required
             options={(groupsData || []).map(
               (g: { group_id: number; group_name: string }) => ({
                 value: g.group_id,
@@ -152,7 +143,8 @@ const EditPatientModal: React.FC<EditPatientModalProps> = ({
               })
             )}
           />
-          <div className="flex justify-end gap-2">
+
+          <div className="flex justify-end gap-2 pt-2">
             <Button
               type="button"
               variant="secondary"
@@ -167,15 +159,16 @@ const EditPatientModal: React.FC<EditPatientModalProps> = ({
           </div>
         </form>
       </Modal>
-      {showAlert && (
+
+      {alert && (
         <div
           className="fixed bottom-6 right-6 z-50 cursor-pointer"
-          onClick={() => setShowAlert(false)}
+          onClick={() => setAlert(null)}
         >
           <Alert
-            variant={alertType}
-            title={alertType === "success" ? "Éxito" : "Error"}
-            message={alertMessage}
+            variant={alert.type}
+            title={alert.type === "success" ? "Éxito" : "Error"}
+            message={alert.message}
           />
         </div>
       )}
