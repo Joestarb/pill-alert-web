@@ -14,11 +14,7 @@ import { useSidebar } from "../../store/SidebarContext";
 import { FaGroupArrowsRotate, FaPersonSkating } from "react-icons/fa6";
 
 const navItems: NavItem[] = [
-  {
-    icon: <BiGrid />,
-    name: "Dashboard",
-    subItems: [{ name: "Ecommerce", path: "/" }],
-  },
+
   {
     icon: <BiUser />,
     name: "Enfermeros",
@@ -38,29 +34,7 @@ const navItems: NavItem[] = [
     name: "Pacientes",
     path: "/admin/patients",
   },
-  {
-    icon: <BiUser />,
-    name: "User Profile",
-    path: "/profile",
-  },
-  {
-    name: "Forms",
-    icon: <BiListCheck />,
-    subItems: [{ name: "Form Elements", path: "/form-elements" }],
-  },
-  {
-    name: "Tables",
-    icon: <BiTable />,
-    subItems: [{ name: "Basic Tables", path: "/basic-tables" }],
-  },
-  {
-    name: "Pages",
-    icon: <BiFirstPage />,
-    subItems: [
-      { name: "Blank Page", path: "/blank" },
-      { name: "404 Error", path: "/error-404" },
-    ],
-  },
+
 ];
 
 const AppSidebar: React.FC = () => {

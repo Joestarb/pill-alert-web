@@ -4,6 +4,7 @@ import themeReducer from "../slices/themeSlice";
 import { supabaseGroupApi } from "../services/GroupSupabase";
 import { supabasePatientsbaseApi } from "../services/patientsSupabase";
 import { medicationsSupabaseApi } from "../services/medicationsSupabase";
+import { supabaseAdminsApi } from "../services/adminsSupabase";
 export const store = configureStore({
   reducer: {
     theme: themeReducer,
@@ -11,6 +12,7 @@ export const store = configureStore({
     [supabaseGroupApi.reducerPath]: supabaseGroupApi.reducer,
     [supabasePatientsbaseApi.reducerPath]: supabasePatientsbaseApi.reducer,
     [medicationsSupabaseApi.reducerPath]: medicationsSupabaseApi.reducer,
+    [supabaseAdminsApi.reducerPath]: supabaseAdminsApi.reducer,
 
   },
   middleware: (getDefaultMiddleware) =>
@@ -19,6 +21,7 @@ export const store = configureStore({
       supabaseGroupApi.middleware,
       supabasePatientsbaseApi.middleware,
       medicationsSupabaseApi.middleware,
+      supabaseAdminsApi.middleware,
     ),
 });
 
