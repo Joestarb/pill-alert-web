@@ -6,6 +6,8 @@ import NotificationDropdown from "../common/NotificationDropdown";
 import UserDropdown from "../common/UserDropdown";
 import ThemeToggleButton from "../common/ThemeToggleButton";
 import { FiAlignJustify } from "react-icons/fi";
+import { IoExitSharp } from "react-icons/io5";
+import Cookies from "js-cookie";
 const AppHeader: React.FC = () => {
   const [isApplicationMenuOpen, setApplicationMenuOpen] = useState(false);
 
@@ -25,13 +27,21 @@ const AppHeader: React.FC = () => {
 
   const inputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if ((event.metaKey || event.ctrlKey) && event.key === "k") {
-        event.preventDefault();
-        inputRef.current?.focus();
-      }
-    };
+const logout = () => {
+  // Borra todas las cookies del sitio
+  Object.keys(Cookies.get()).forEach(cookieName => {
+    Cookies.remove(cookieName, { path: "/" });
+  });
+  window.location.href = "/login";
+};
+
+useEffect(() => {
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if ((event.metaKey || event.ctrlKey) && event.key === "k") {
+      event.preventDefault();
+      inputRef.current?.focus();
+    }
+  };
 
     document.addEventListener("keydown", handleKeyDown);
 
@@ -95,6 +105,9 @@ const AppHeader: React.FC = () => {
         >
           <div className="flex items-center gap-2 2xsm:gap-3">
             <ThemeToggleButton />
+            <button onClick={logout} className=" cursor-pointer">
+            <IoExitSharp className=" text-4xl  dark:text-gray-600"/>
+            </button>
           </div>
         </div>
       </div>

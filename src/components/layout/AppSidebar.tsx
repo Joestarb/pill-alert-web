@@ -12,6 +12,7 @@ import { Link, useLocation } from "react-router";
 import { NavItem } from "../../interfaces/pages/sidebar";
 import { useSidebar } from "../../store/SidebarContext";
 import { FaGroupArrowsRotate, FaPersonSkating } from "react-icons/fa6";
+import { FaLaptop } from "react-icons/fa";
 
 const navItems: NavItem[] = [
 
@@ -38,7 +39,11 @@ const navItems: NavItem[] = [
     name: "medicinas",
     path: "/admin/medicnies",
   },
-
+  {
+    icon: <FaLaptop />,
+    name: "administradores",
+    path: "/admin/admins",
+  },
 ];
 
 const AppSidebar: React.FC = () => {

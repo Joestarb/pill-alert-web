@@ -20,6 +20,7 @@ const InsertMedicationModal: React.FC<InsertMedicationModalProps> = ({
   refetchMedications,
 }) => {
   const [form, setForm] = useState({ medications: "" });
+  const [touched, setTouched] = useState(false);
 
   const { refetch } = useGetMedicationsQuery({});
   const [insertMedication, { isLoading, error, isSuccess }] =
@@ -34,10 +35,13 @@ const InsertMedicationModal: React.FC<InsertMedicationModalProps> = ({
   }>(null);
 
   useEffect(() => {
-    setForm({ medications: "" });
-    setAlertMessage("");
-    setAlertType("success");
-    setPendingAlert(null);
+    if (isOpen) {
+      setForm({ medications: "" });
+      setTouched(false);
+      setAlertMessage("");
+      setAlertType("success");
+      setPendingAlert(null);
+    }
   }, [isOpen]);
 
   useEffect(() => {
@@ -53,7 +57,7 @@ const InsertMedicationModal: React.FC<InsertMedicationModalProps> = ({
     if (isSuccess) {
       setPendingAlert({
         type: "success",
-        message: "Medicamento insertado correctamente",
+        message: "Medicamento agregado correctamente",
       });
       if (typeof refetchMedications === "function") refetchMedications();
       refetch();
@@ -61,35 +65,83 @@ const InsertMedicationModal: React.FC<InsertMedicationModalProps> = ({
     } else if (error) {
       setPendingAlert({
         type: "error",
-        message: "Error al insertar medicamento",
+        message: "Error al agregar el medicamento. Por favor, inténtelo nuevamente.",
       });
     }
   }, [isSuccess, error, refetchMedications, refetch, onClose]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!touched) setTouched(true);
     setForm({ medications: e.target.value });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!form.medications.trim()) {
+      setAlertType("error");
+      setAlertMessage("Por favor ingrese un nombre de medicamento");
+      setShowAlert(true);
+      return;
+    }
     await insertMedication({ name: form.medications });
   };
 
+  const isFormValid = form.medications.trim() !== "";
+
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Agregar Medicamento">
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <Input
-          label="Nombre del Medicamento"
-          value={form.medications}
-          onChange={handleChange}
-          required
+    <>
+      <Modal
+        isOpen={isOpen}
+        onClose={onClose}
+        title="Agregar Nuevo Medicamento"
+        size="md"
+      >
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="mb-6">
+            <Input
+              label="Nombre del Medicamento"
+              placeholder="Ej: Paracetamol 500mg"
+              value={form.medications}
+              onChange={handleChange}
+              required
+              autoFocus
+              error={touched && !isFormValid ? "Este campo es requerido" : undefined}
+            />
+            <p className="mt-2 text-sm text-gray-500">
+              Ingrese el nombre completo del medicamento, incluyendo la dosis si es aplicable.
+            </p>
+          </div>
+
+          <div className="flex justify-end space-x-3 pt-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              disabled={isLoading}
+            >
+              Cancelar
+            </Button>
+            <Button
+              type="submit"
+              loading={isLoading}
+              disabled={!isFormValid || isLoading}
+              variant="primary"
+            >
+              {isLoading ? "Agregando..." : "Agregar Medicamento"}
+            </Button>
+          </div>
+        </form>
+      </Modal>
+
+      {showAlert && (
+        <Alert
+          type={alertType}
+          message={alertMessage}
+          onClose={() => setShowAlert(false)}
+          autoClose={5000}
         />
-        <Button type="submit" loading={isLoading}>
-          Agregar
-        </Button>
-      </form>
-      {showAlert && <Alert type={alertType} message={alertMessage} />}
-    </Modal>
+      )}
+    </>
   );
 };
 

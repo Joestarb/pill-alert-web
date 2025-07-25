@@ -11,6 +11,7 @@ export async function loginUser(email: string, password: string) {
     .select("*")
     .eq("user_email", email)
     .eq("user_password", hashedPassword)
+    .eq("fk_role_id", 3)
     .single();
   if (error) {
     throw error;

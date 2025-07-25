@@ -19,6 +19,7 @@ export default function AdminRoutes() {
           <Route path="patients" element={<Patients />} />
           <Route path="admins" element={<Admins />} />
           <Route path="medicnies" element={<Medications />} />
+          <Route path="add-admin" element={< Admins/>} />
 
         </Route>
       </Route>

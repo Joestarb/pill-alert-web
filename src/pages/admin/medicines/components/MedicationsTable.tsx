@@ -69,6 +69,8 @@ const MedicationsTable: React.FC<MedicationsTableProps> = ({
         <Button onClick={onInsert}>Agregar Medicamento</Button>
       </div>
       <Table
+              className="border border-gray-200"
+
         columns={columns}
         data={data || []}
         onEdit={handleEdit}
