@@ -20,7 +20,6 @@ const navItems: NavItem[] = [
     name: "Enfermeros",
     subItems: [
       { name: "Consulta", path: "/admin/register" },
-      { name: "Calendario", path: "/admin/calendar" }
 
     ],
   },
@@ -33,6 +32,11 @@ const navItems: NavItem[] = [
     icon: <FaPersonSkating />,
     name: "Pacientes",
     path: "/admin/patients",
+  },
+  {
+    icon: <BiGrid />,
+    name: "medicinas",
+    path: "/admin/medicnies",
   },
 
 ];

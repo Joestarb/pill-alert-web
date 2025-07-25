@@ -6,6 +6,7 @@ import Groups from "../pages/admin/groups/Groups";
 import Patients from "../pages/admin/patients/Patients";
 import Register from "../pages/admin/register/Register";
 import ProtectedRoute from "./ProtectedRoute";
+import Medications from "../pages/admin/medicines/Medications";
 
 export default function AdminRoutes() {
   return (
@@ -17,6 +18,8 @@ export default function AdminRoutes() {
           <Route path="groups" element={<Groups />} />
           <Route path="patients" element={<Patients />} />
           <Route path="admins" element={<Admins />} />
+          <Route path="medicnies" element={<Medications />} />
+
         </Route>
       </Route>
     </Routes>
